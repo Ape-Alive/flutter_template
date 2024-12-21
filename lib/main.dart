@@ -1,69 +1,92 @@
-import 'package:flutter/material.dart';
+import 'dart:io';
 
-void main() {
-  runApp(const MyApp());
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:get_storage/get_storage.dart';
+import 'package:get/get.dart';
+import 'package:flutter_template/store/global_state/global_state.dart';
+import 'package:flutter_template/router/app_router.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await GetStorage.init();
+
+  GlobalBinding().dependencies();
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
+  final ThemeController themeController = Get.find();
+  final AppRouter appRouter = AppRouter();
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
+    return Obx(() {
+      return MaterialApp.router(
+        debugShowCheckedModeBanner: false,
+        title: 'flutter-template',
+        theme: createLightThemeData(),
+        darkTheme: createDarkThemeData(),
+        themeMode: themeController.themeMode.value,
+        routerConfig: appRouter.router,
+      );
     });
   }
+}
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
+ThemeData createLightThemeData() {
+  return ThemeData.light(useMaterial3: true).copyWith(
+    appBarTheme: const AppBarTheme(
+      backgroundColor: Colors.transparent,
+      scrolledUnderElevation: 0,
+    ),
+    iconButtonTheme: (!kIsWeb && Platform.isMacOS)
+        ? IconButtonThemeData(
+            style: ButtonStyle(
+              overlayColor: WidgetStateProperty.all(Colors.transparent),
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
-        ),
+          )
+        : null,
+    dividerColor: Colors.transparent,
+    dialogBackgroundColor: Colors.white,
+    dialogTheme: DialogTheme(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
-    );
-  }
+      elevation: 0,
+    ),
+    textButtonTheme: TextButtonThemeData(
+      style: TextButton.styleFrom(
+        foregroundColor: const Color.fromARGB(255, 9, 185, 85),
+      ),
+    ),
+  );
+}
+
+ThemeData createDarkThemeData() {
+  return ThemeData.dark(useMaterial3: true).copyWith(
+    appBarTheme: const AppBarTheme(
+      backgroundColor: Colors.transparent,
+      scrolledUnderElevation: 0,
+    ),
+    iconButtonTheme: (!kIsWeb && Platform.isMacOS)
+        ? IconButtonThemeData(
+            style: ButtonStyle(
+              overlayColor: WidgetStateProperty.all(Colors.transparent),
+            ),
+          )
+        : null,
+    dividerColor: Colors.transparent,
+    dialogBackgroundColor: const Color.fromARGB(255, 48, 48, 48),
+    dialogTheme: DialogTheme(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+      ),
+      elevation: 0,
+    ),
+    textButtonTheme: TextButtonThemeData(
+      style: TextButton.styleFrom(
+        foregroundColor: const Color.fromARGB(255, 9, 185, 85),
+      ),
+    ),
+  );
 }

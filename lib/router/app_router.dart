@@ -8,13 +8,19 @@ import '../modules/home/home_module.dart';
 
 class AppRouter {
   GoRouter get router => GoRouter(
-        initialLocation: '/login',
+        initialLocation: '/splash',
         routes: [
           GoRoute(
             path: '/login',
             builder: (context, state) {
               LoginBinding().dependencies();
               return const Login();
+            },
+          ),
+          GoRoute(
+            path: '/splash',
+            builder: (context, state) {
+              return const SplashScreen();
             },
           ),
           //使用shellroute 保持父级布局
@@ -33,8 +39,11 @@ class AppRouter {
               ]),
         ],
         //全局路由守卫
-        redirect: (context, state) {
+        redirect: (context, state) async {
           const isLoggedIn = false;
+          if (state.fullPath == '/splash') {
+            return null; // 保持当前路径，启动页逻辑通过定时器控制
+          }
           if (!isLoggedIn && state.path != '/login') {
             return '/login';
           }
