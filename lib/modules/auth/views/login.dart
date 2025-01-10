@@ -1,6 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:flutter_template/modules/auth/auth_module.dart';
+import 'package:get/get.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -19,7 +22,6 @@ class _LoginState extends State<Login> {
   }
 }
 
-
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -31,6 +33,8 @@ class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _codeController = TextEditingController();
+  // 获取控制器实例
+  final LoginController loginController = Get.find<LoginController>();
 
   bool _isSendingCode = false;
   bool _isPhoneValid = false;
@@ -90,9 +94,23 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void _login() {
     if (_formKey.currentState?.validate() ?? false) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('登录成功')),
-      );
+      loginController.login(_phoneController.text, _codeController.text);
+      // 使用 GetX 的延迟机制，确保状态更新后再进行导航
+      Future.delayed(Duration.zero, () {
+        if (mounted) {
+          if (loginController.isLoggedIn.value) {
+            // 导航到 home 页面
+            context.go('/home');
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('登录失败')),
+            );
+          }
+        }
+      });
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   const SnackBar(content: Text('登录成功')),
+      // );
     }
   }
 
@@ -141,7 +159,9 @@ class _LoginScreenState extends State<LoginScreen> {
                           borderRadius: BorderRadius.circular(8),
                         ),
                         suffix: GestureDetector(
-                          onTap: (_isSendingCode || !_isPhoneValid) ? null : _sendCode,
+                          onTap: (_isSendingCode || !_isPhoneValid)
+                              ? null
+                              : _sendCode,
                           child: Text(
                             _isSendingCode
                                 ? "$_countdown 秒后重发"

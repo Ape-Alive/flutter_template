@@ -5,7 +5,7 @@ class LoginController extends GetxController {
   void login(String username, String password) {
     // 模拟登录逻辑
     isLoggedIn.value = true;
-    Get.snackbar("Login", "Welcome, $username!");
+    // Get.snackbar("Login", "Welcome, $username!");
   }
 
   void logout() {

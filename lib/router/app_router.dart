@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_template/widgets/main_page.dart';
-// import 'package:get/get.dart';
+// import 'package:flutter_template/modules/auth/auth_module.dart';
+import 'package:get/get.dart';
 
 import '../modules/auth/auth_module.dart';
 import '../modules/home/home_module.dart';
@@ -40,7 +41,9 @@ class AppRouter {
         ],
         //全局路由守卫
         redirect: (context, state) async {
-          const isLoggedIn = false;
+          final LoginController loginController = Get.find<LoginController>();
+          final bool isLoggedIn = loginController.isLoggedIn.value;
+
           if (state.fullPath == '/splash') {
             return null; // 保持当前路径，启动页逻辑通过定时器控制
           }
